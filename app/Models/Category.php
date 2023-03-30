@@ -10,15 +10,16 @@ class Category extends Model
     use HasFactory;
 
     protected $table = 'categories';
+    protected $guarded = [];
 
-    protected $fillable = [
-        'name',
-        'slug',
-        'description',
-        'image',
-        'meta_title',
-        'meta_keyword',
-        'meta_description',
-        'status',
-    ];
+    // protected $fillable = [
+    //     'name',
+    //     'slug',
+    //     'description',
+    //     'image',
+    //     'meta_title',
+    //     'meta_keyword',
+    //     'meta_description',
+    //     'status',
+    // ];
 }

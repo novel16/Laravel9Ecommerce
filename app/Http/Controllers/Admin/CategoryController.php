@@ -7,6 +7,7 @@ use App\Http\Requests\CategoryFormRequest;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
@@ -20,15 +21,24 @@ class CategoryController extends Controller
     }
 
     
-    public function store(CategoryFormRequest $request){
-
+    public function store(Request $request){
         
-        $validated = $request->validated();
+        $validator = Validator::make($request->all(),[
+            "name" => ['required', 'min:4'],
+            "slug" => ['required', 'min:4'],
+            "description" => ['required', 'min:4'],
+            "image" => ['required', 'mimes:png,jpeg,jpg'],
+            "meta_title" => ['required', 'min:4'],
+            "meta_keyword" => ['required', 'min:4'],
+            "meta_description" => ['required', 'min:4'],
+            "status" => ['required'],
+
+        ]);
 
         $category = new Category;
-        $category->name = $validated['name'];
-        $category->slug = Str::slug($validated['slug']);
-        $category->description = $validated['description'];
+        $category->name = $request['name'];
+        $category->slug = Str::slug($request['slug']);
+        $category->description = $request['description'];
 
         
         if($request->hasFile('image')){
@@ -42,22 +52,16 @@ class CategoryController extends Controller
             $file->move('uploads/category/',$filename);
         }
 
-        $category->meta_title = $validated['meta_title'];
-        $category->meta_keyword = $validated['meta_keyword'];
-        $category->meta_description = $validated['meta_description'];
+        $category->meta_title = $request['meta_title'];
+        $category->meta_keyword = $request['meta_keyword'];
+        $category->meta_description = $request['meta_description'];
 
         $category->status = $request->status == true ? '1': '0';
         $category->save();
 
         return redirect('admin/category')->with('message', 'Category successfully added!');
+        
 
     }
-    
-
-
-
-
-
-
 
 }
