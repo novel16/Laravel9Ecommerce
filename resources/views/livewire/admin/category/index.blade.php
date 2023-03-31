@@ -83,7 +83,7 @@
 
 <script>
     function deleteCategory(id) {
-        if (confirm("Are you sure you want to delete?")) {
+        if (confirm("Are you sure, you want to delete this category?")) {
             document.getElementById('category-delete-action-'+id).submit();
         }
     }

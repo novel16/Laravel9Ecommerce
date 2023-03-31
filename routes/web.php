@@ -37,4 +37,8 @@ Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function(){
     });
 
 
+    //Brand routes
+    Route::get('/brands', App\Http\Livewire\Admin\Brand\Index::class);
+
+
 });
