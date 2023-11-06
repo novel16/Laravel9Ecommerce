@@ -81,6 +81,7 @@
   {{-- fontawesome --}}
   <script src="{{asset('admin/js/all.min.js')}}"></script>
 
+    @yield('scripts')
 
     @livewireScripts
     @stack('script')

@@ -2,8 +2,8 @@
 
 
 {{-- add brand modal --}}
-<div wire:ignore.self class="modal fade" id="addBrandModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div wire:ignore.self class="modal fade"  id="addBrandModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog ">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Add Brand</h5>
@@ -13,23 +13,42 @@
             <div class="modal-body">
                 <form wire:submit.prevent="storeBrand">
 
-                    <div class="mb-3 form-group">
-                        <label for="Brand Name">Brand Name</label>
-                        <input type="text" wire:model.defer="name" class="form-control">
-                        @error('name')
+                    <div class="mb-3">
+                        <label >Select Category</label>
+                        <select wire:model="category_id" id="" class="form-control" required>
+                            <option value="">--Select Category--</option>
+
+                            @foreach ($categories as $categoryItem)
+                                
+                                <option value="{{ $categoryItem->id }}">{{ $categoryItem->name }}</option>
+
+                            @endforeach
+                           
+
+                        </select>
+                        @error('category_id')
                             <small class="text-danger">{{ $message }}</small> 
                         @enderror
+
+                    </div>
+
+                    <div class="mb-3 form-group">
+                        <label for="Brand Name">Brand Name</label>
+                        <input type="text" wire:model="name" class="form-control">
+                        @error('name')
+                            <small class="text-danger">{{ $message }}</small> 
+                        @enderror 
                     </div>
                     <div class="mb-3 form-group">
                         <label for="Brand Name">Brand Slug</label>
-                        <input type="text" wire:model.defer="slug"  class="form-control">
+                        <input type="text" wire:model="slug"  class="form-control">
                         @error('slug')
                             <small class="text-danger">{{ $message }}</small> 
                         @enderror
                     </div>
                     <div class=" form-group">
                         <label for="Brand Name">Status</label><br>
-                        <input type="checkbox" wire:model.defer="status" > Checked = <span class="text-muted">Hidden</span>  | Unchecked = <span class="text-muted">Visible</span>
+                        <input type="checkbox" wire:model="status" > Checked = <span class="text-muted">Hidden</span>  | Unchecked = <span class="text-muted">Visible</span>
                     </div>
                 
             </div>
@@ -65,6 +84,25 @@
                     <div class="modal-body">
 
                         <form wire:submit.prevent="updateBrand">
+                            
+                            <div class="mb-3">
+                                <label >Select Category</label>
+                                <select wire:model.defer="category_id" id="" class="form-control" required>
+                                    <option value="">--Select Category--</option>
+        
+                                    @foreach ($categories as $categoryItem)
+                                        
+                                        <option value="{{ $categoryItem->id }}">{{ $categoryItem->name }}</option>
+        
+                                    @endforeach
+                                   
+        
+                                </select>
+                                @error('category_id')
+                                    <small class="text-danger">{{ $message }}</small> 
+                                @enderror
+        
+                            </div>
         
                             <div class="mb-3 form-group">
                                 <label for="Brand Name">Brand Name</label>

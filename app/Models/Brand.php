@@ -12,4 +12,13 @@ class Brand extends Model
     protected $table = 'brands';
 
     protected $guarded = [];
+
+
+    public function category()
+    {
+        return $this->belongsTo(category::class, 'category_id', 'id');
+    }
+
 }
+
+

@@ -25,6 +25,7 @@ class CategoryController extends Controller
     public function store(CategoryFormRequest $request){
 
         $validatedData = $request->validated();
+       
 
         $category = new Category;
         $category->name = $validatedData['name'];
@@ -93,7 +94,7 @@ class CategoryController extends Controller
         $category->meta_description = $validatedData['meta_description'];
 
         $category->status = $request->status == true ? '1': '0';
-        $category->save();
+        $category->update();
 
         return redirect('admin/category')->with('message', 'Category successfully updated!');
 
@@ -113,5 +114,9 @@ class CategoryController extends Controller
         return redirect('admin/category')->with('message', 'Category successfully deleted!');
 
     }
+
+
+
+    
 
 }
