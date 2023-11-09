@@ -1,6 +1,15 @@
 <div>
     <div class="py-3 py-md-5">
         <div class="container">
+
+            @if (session()->has('message'))
+
+                <div class="alert alert-success">
+                    {{ session('message') }}
+                </div>
+                
+            @endif
+
             <div class="row">
                 <div class="col-md-5 mt-3">
                     <div class="bg-white border">
@@ -16,6 +25,8 @@
                     <div class="product-view">
                         <h4 class="product-name">
                             {{$product->name}}
+
+                            
                             <label class="label-stock bg-success">In Stock</label>
                         </h4>
                         <hr>
@@ -27,11 +38,32 @@
                             <span class="original-price">${{$product->original_price}}</span>
                         </div>
                         <div>
-                            @if ($product->productColors)
-                                @foreach ($product->productColors as $colorItem)
-                                    <input type="radio" name="colorSelection" value="{{ $colorItem->id }}" /> {{ $colorItem->color->name }}
-                                @endforeach
+                            @if ($product->productColors->count() > 0)
+                                
+                                @if ($product->productColors)
+                                    @foreach ($product->productColors as $colorItem)
+                                        {{-- <input type="radio" name="colorSelection" value="{{ $colorItem->id }}" /> {{ $colorItem->color->name }} --}}
+                                        <label class="colorSelectionLabel" style="background-color: {{ $colorItem->color->code }} " wire:click = "colorSelected({{ $colorItem->id }})">
+                                            {{ $colorItem->color->name }}
+                                        </label>
+                                    @endforeach
+                                @endif
+
+                                @if ($this->productSelectedQuantity == 'outOfStock')
+                                   <br> <label class="btn btn-sm text-light mt-1 label-stock bg-danger">Out of Stock</label>
+                                @elseif ($this->productSelectedQuantity > 0)
+                                    <br><label class="btn btn-sm text-light mt-1 label-stock bg-success">In Stock</label>
+                                @endif
+
+                            @else
+                                @if ($product->quantity)
+                                    <label class="btn btn-sm text-light label-stock bg-success">In Stock</label>
+                                @else
+                                    <label class="btn btn-sm text-light label-stock bg-danger">Out of Stock</label>
+                                @endif
                             @endif
+
+
                         </div>
                         <div class="mt-2">
                             <div class="input-group">
@@ -41,8 +73,16 @@
                             </div>
                         </div>
                         <div class="mt-2">
-                            <a href="" class="btn btn1"> <i class="fa fa-shopping-cart"></i> Add To Cart</a>
-                            <a href="" class="btn btn1"> <i class="fa fa-heart"></i> Add To Wishlist </a>
+                            <a href="" class="btn  rounded-0 btn-outline-primary"> <i class="fa fa-shopping-cart"></i> Add To Cart</a>
+                            <button type="button" wire:click="addToWishlist({{ $product->id }})" class="btn  rounded-0 btn-outline-primary">
+                                <span wire:loading.remove>
+                                    <i class="fa fa-heart"></i> Add To Wishlist 
+                                </span>
+                                <span wire:loading wire:target = "addToWishlist">
+                                    Adding...
+                                </span>
+                                 
+                            </button>
                         </div>
                         <div class="mt-3">
                             <h5 class="mb-0">Small Description</h5>
@@ -70,3 +110,5 @@
         </div>
     </div>
 </div>
+
+

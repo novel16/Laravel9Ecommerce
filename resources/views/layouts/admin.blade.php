@@ -54,6 +54,14 @@
 
 
 
+    <footer class="footer">
+        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+          <small class="text-muted text-center text-sm-left d-block d-sm-inline-block">© This system is created by <span class="text-primary">Novel P. Chavez</span> | all right reserved</small>
+         
+        </div>
+        </footer>
+
+
 
 
 
