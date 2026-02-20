@@ -6,15 +6,16 @@ use App\Mail\PlaceOrderMailable;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Orderitem;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
-
+use Stripe\Stripe;
 
 class CheckoutShow extends Component
 {
     public $carts, $totalProductAmount = 0;
 
-    public $fullname, $email, $phone= "", $address="", $pincode="", $payment_mode = NULL, $payment_id = NULL;
+    public $fullname, $email, $phone = "", $address = "", $pincode = "", $payment_mode = NULL, $payment_id = NULL;
 
     public function rules()
     {
@@ -32,7 +33,7 @@ class CheckoutShow extends Component
         $this->validate();
         $order = Order::create([
             'user_id' => auth()->user()->id,
-            'tracking_no' => 'azul-'. \Illuminate\Support\Str::random(10),
+            'tracking_no' => 'azul-' . \Illuminate\Support\Str::random(10),
             'fullname' => $this->fullname,
             'email' => $this->email,
             'phone' => $this->phone,
@@ -43,8 +44,7 @@ class CheckoutShow extends Component
             'payment_id' => $this->payment_id,
         ]);
 
-        foreach($this->carts as $cartItem)
-        {
+        foreach ($this->carts as $cartItem) {
 
             Orderitem::create([
                 'order_id' => $order->id,
@@ -54,22 +54,20 @@ class CheckoutShow extends Component
                 'price' => $cartItem->product->selling_price,
             ]);
 
-            if($cartItem->product_color_id != NULL){
+            if ($cartItem->product_color_id != NULL) {
                 $cartItem->productColor()->where('id', $cartItem->product_color_id)->decrement('quantity', $cartItem->quantity);
-            }else{
+            } else {
                 $cartItem->product()->where('id', $cartItem->product_id)->decrement('quantity', $cartItem->quantity);
             }
-
         }
-       return $order;
+        return $order;
     }
 
     public function codOrder()
     {
         $this->payment_mode = 'Cash on Delivery';
         $codOrder = $this->placeOrder();
-        if($codOrder)
-        {
+        if ($codOrder) {
             Cart::where('user_id', auth()->user()->id)->delete();
 
             try {
@@ -79,26 +77,62 @@ class CheckoutShow extends Component
                 //throw $th;
             }
 
-             $this->dispatchBrowserEvent('message', [
+            $this->dispatchBrowserEvent('message', [
                 'text' => 'Order placed successfully',
                 'type' => 'success',
                 'status' => 200
             ]);
-            return redirect()->to('thank-you');
-        }else{
-             $this->dispatchBrowserEvent('message', [
+            return redirect()->to('thankyou');
+        } else {
+            $this->dispatchBrowserEvent('message', [
                 'text' => 'Something went wrong',
                 'type' => 'error',
                 'status' => 500
             ]);
         }
     }
+    public function onlinePayment()
+    {
+        $stripe = new \Stripe\StripeClient(env('STRIPE_SECRET_KEY'));
+
+        $carts = Cart::with('product', 'productColor')
+            ->where('user_id', Auth::id())
+            ->get();
+
+        $line_data = [];
+
+        foreach ($carts as $cart) {
+            $line_data[] = [
+                'price_data' => [
+                    'currency' => 'php',
+                    'product_data' => [
+                        'name' => $cart->product->name,
+                    ],
+                    'unit_amount' => $cart->product->selling_price * 100,
+                ],
+                'quantity' => $cart->quantity,
+            ];
+        }
+
+        $session = $stripe->checkout->sessions->create([
+            'line_items' => $line_data, // ✅ FIXED
+            'mode' => 'payment',
+            'success_url' => 'http://127.0.0.1:8000/../thank-you?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => 'http://127.0.0.1:8000/cancel',
+        ]);
+
+        $this->payment_mode = 'Stripe';
+        $this->payment_id = $session->id;
+
+        $this->placeOrder();
+
+        return redirect()->to($session->url);
+    }
     public function totalProductAmount()
     {
         $this->totalProductAmount = 0;
         $this->carts = Cart::where('user_id', auth()->user()->id)->get();
-        foreach($this->carts as $cartItem)
-        {
+        foreach ($this->carts as $cartItem) {
             $this->totalProductAmount += $cartItem->product->selling_price * $cartItem->quantity;
         }
         return $this->totalProductAmount;
