@@ -52,7 +52,11 @@ Route::middleware(['auth'])->group(function(){
     Route::post('/change-password',[FrontendUserController::class, 'changePassword']);
 });
 
-Route::get('/thank-you', [FrontendController::class, 'thankyou']);
+Route::get('thank-you', [FrontendController::class, 'thankyou']);
+
+Route::get('cancel', [FrontendController::class, 'cancel']);
+
+Route::get('/thankyou', [FrontendController::class, 'thankYouCod'])->name('thankyou');
 
 Route::get('/home', function () {
     return redirect('/');
