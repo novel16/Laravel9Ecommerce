@@ -19,6 +19,15 @@
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.min.css') }}">
+
+     {{-- owl carousel --}}
+    <link rel="stylesheet" href="{{ asset('assets/css/owl.theme.default.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/owl.carousel.min.css') }}">
+
+    {{-- exzoom --}}
+    <link rel="stylesheet" href="{{ asset('assets/exzoom/jquery.exzoom.css') }}">
+
+
     <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}">
 
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
@@ -33,7 +42,7 @@
 
     @livewireStyles
 </head>
-<body>
+<body style="background: #EEEEEE">
     <div id="app">
 
         @include('layouts.inc.frontend.navbar')
@@ -99,6 +108,8 @@
         <main>
             @yield('content')
         </main>
+
+         @include('layouts.inc.frontend.footer')
     </div>
 
     
@@ -118,7 +129,13 @@
 
     </script>
 
+    <script src="{{ asset('assets/exzoom/jquery.exzoom.js') }}"></script>
+
+    <script src="{{ asset('assets/js/owl.carousel.min.js') }}"></script>
+    @yield('script')
+
     @livewireScripts
+    @stack('scripts')
 </body>
 
 

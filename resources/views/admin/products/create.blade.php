@@ -136,6 +136,12 @@
                                         <input type="checkbox" name="trending" style="width:50px; height: 50px;">
                                     </div>
                                 </div>
+                                 <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="Featured">Featured</label><br>
+                                        <input type="checkbox" name="featured" style="width:50px; height: 50px;">
+                                    </div>
+                                </div>
 
                                 <div class="col-md-4">
                                     <div class="mb-3">
