@@ -7,7 +7,106 @@ use Livewire\Component;
 
 class CartShow extends Component
 {
-    public $cart;
+    public $cart, $totalPrice = 0;
+
+    public function decrementQuantity(int $cartItemId)
+    {
+        $cartData = Cart::where('id', $cartItemId)->where('user_id', auth()->user()->id)->first();
+        if($cartData){
+           if($cartData->quantity > 1){
+             $cartData->decrement('quantity');
+             $this->dispatchBrowserEvent('message', [
+                'text' => 'Quantity updated',
+                'type' => 'success',
+                'status' => 200
+            ]);
+           }else{
+             $cartData->delete();
+             $this->dispatchBrowserEvent('message', [
+                'text' => 'Item removed from cart',
+                'type' => 'success',
+                'status' => 200
+            ]);
+           }
+        }else{
+            $this->dispatchBrowserEvent('message', [
+                'text' => 'Item not found in cart',
+                'type' => 'error',
+                'status' => 404
+            ]);
+        }
+    }
+    public function incrementQuantity(int $cartItemId)
+    {
+        $cartData = Cart::where('id', $cartItemId)->where('user_id', auth()->user()->id)->first();
+        if($cartData){
+
+            if($cartData->productColor()->where('id', $cartData->product_color_id)->exists()){
+
+                $productColor = $cartData->productColor()->where('id', $cartData->product_color_id)->first();
+                if($productColor->quantity > $cartData->quantity){
+
+                    $cartData->increment('quantity');
+                    $this->dispatchBrowserEvent('message', [
+                        'text' => 'Quantity updated',
+                        'type' => 'success',
+                        'status' => 200
+                    ]);
+
+                }else{
+                     $this->dispatchBrowserEvent('message', [
+                        'text' => 'Product color is only available in '.$productColor->quantity.' quantity',
+                        'type' => 'info',
+                        'status' => 200
+                    ]);
+                }
+
+            }else{
+
+                if($cartData->product->quantity > $cartData->quantity){
+                    $cartData->increment('quantity');
+                    $this->dispatchBrowserEvent('message', [
+                        'text' => 'Quantity updated',
+                        'type' => 'success',
+                        'status' => 200
+                    ]);
+                }else{
+                    $this->dispatchBrowserEvent('message', [
+                        'text' => 'Product is only available in '.$cartData->product->quantity.' quantity',
+                        'type' => 'info',
+                        'status' => 200
+                    ]);
+                }
+            }
+        }else{
+            $this->dispatchBrowserEvent('message', [
+                'text' => 'Item not found in cart',
+                'type' => 'error',
+                'status' => 404
+            ]);
+        }
+    }
+
+    public function removeCartItem(int $cartItemId)
+    {
+        $cartRemoveData = Cart::where('user_id', auth()->user()->id)->where('id', $cartItemId)->first();
+        if($cartRemoveData){
+            $cartRemoveData->delete();
+           $this->emit('cartCountUpdated');
+            $this->dispatchBrowserEvent('message', [
+                'text' => 'Item removed from cart',
+                'type' => 'success',
+                'status' => 200
+            ]);
+        }else{
+            $this->dispatchBrowserEvent('message', [
+                'text' => 'Item not found from cart',
+                'type' => 'error',
+                'status' => 404
+            ]);
+        }
+    }
+
     public function render()
     {
         $this->cart = Cart::where('user_id', auth()->user()->id)->get();

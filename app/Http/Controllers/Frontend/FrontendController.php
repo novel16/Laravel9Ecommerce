@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Product;
 use App\Models\Slider;
 use Illuminate\Http\Request;
 
@@ -12,7 +13,21 @@ class FrontendController extends Controller
     public function index()
     {
         $sliders = Slider::where('status','0')->get();
-        return view('frontend.index', compact('sliders'));
+        $trendingProducts = Product::where('trending', '1')->latest()->take(15)->get();
+        $newArrivalProducts = Product::latest()->take(8)->get();
+        $featuredProducts = Product::where('featured', '1')->latest()->take(8)->get();
+        return view('frontend.index', compact('sliders','trendingProducts', 'newArrivalProducts','featuredProducts'));
+    }
+
+    public function searchProducts(Request $request)
+    {
+        if($request->search)
+        {
+            $searchProducts = Product::where('name', 'LIKE', '%'.$request->search.'%')->latest()->paginate(15);
+            return view('frontend.pages.search', compact('searchProducts'));
+        }else{
+            return redirect()->back()->with('message', 'Empty search');
+        }
     }
 
 
@@ -29,8 +44,6 @@ class FrontendController extends Controller
 
         if($category)
         {
-
-            
             return view('frontend.collections.products.index', compact('category'));
 
         }else
@@ -59,5 +72,22 @@ class FrontendController extends Controller
         {
             return redirect()->back();
         }
+    }
+
+    public function newArrival()
+    {
+        $newArrivalProducts = Product::latest()->take(8)->get();
+        return view('frontend.pages.new-arrival', compact('newArrivalProducts'));
+    }
+
+    public function featuredProducts()
+    {
+          $featuredProducts = Product::where('featured', '1')->latest()->get();
+        return view('frontend.pages.featured-products', compact('featuredProducts'));
+    }
+
+   public function thankyou()
+    {
+        return view('frontend.thank-you');
     }
 }

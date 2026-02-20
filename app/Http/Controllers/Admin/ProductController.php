@@ -19,7 +19,7 @@ class ProductController extends Controller
     
     public function index(){
 
-        $products = Product::all();
+        $products = Product::orderBy('created_at', 'desc')->paginate(10);
         return view('admin.products.index', compact('products'));
 
     }
@@ -50,6 +50,7 @@ class ProductController extends Controller
             'selling_price' =>$validatedData['selling_price'],
             'quantity' =>$validatedData['quantity'],
             'trending' =>$request->trending == true ? '1' : '0',
+            'featured' =>$request->featured == true ? '1' : '0',
             'status' =>$request->status == true ? '1' : '0',
             'meta_title' =>$validatedData['meta_title'],
             'meta_keyword' =>$validatedData['meta_keyword'],
@@ -132,6 +133,7 @@ class ProductController extends Controller
                 'selling_price' =>$validatedData['selling_price'],
                 'quantity' =>$validatedData['quantity'],
                 'trending' =>$request->trending == true ? '1' : '0',
+                'featured' =>$request->featured == true ? '1' : '0',
                 'status' =>$request->status == true ? '1' : '0',
                 'meta_title' =>$validatedData['meta_title'],
                 'meta_keyword' =>$validatedData['meta_keyword'],
